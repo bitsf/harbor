@@ -160,6 +160,7 @@ func (d *DefaultManager) ListExecutions(policyID int64, query *q.Query) ([]*Exec
 		e1.Status = e.Status
 		e1.StartTime = e.StartTime
 		e1.EndTime = e.EndTime
+		e1.Trigger = e.Trigger
 		e1.DryRun = e.DryRun
 		execs1 = append(execs1, e1)
 	}
@@ -183,6 +184,7 @@ func (d *DefaultManager) GetExecution(eid int64) (*Execution, error) {
 	e1.Status = e.Status
 	e1.StartTime = e.StartTime
 	e1.EndTime = e.EndTime
+	e1.Trigger = e.Trigger
 	e1.DryRun = e.DryRun
 	return e1, nil
 }
