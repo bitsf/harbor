@@ -3,7 +3,7 @@ set -x
 set -e
 
 cd ./src/portal
-npm install -g -q --no-progress angular-cli
-npm install -g -q --no-progress karma
+sudo npm install -q -g --no-progress --unsafe-perm=true --allow-root angular-cli
+sudo npm install -q -g --no-progress --unsafe-perm=true --allow-root karma
 npm install -q --no-progress
 npm run test && cd -
