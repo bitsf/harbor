@@ -26,7 +26,7 @@ def push_image_to_project(project_name, registry, username, password, image, tag
     new_harbor_registry, new_tag = _docker_api.docker_image_tag(r'{}:{}'.format(image, tag), r'{}/{}/{}'.format(registry, project_name, image))
     time.sleep(2)
 
-    _docker_api.docker_image_push(new_harbor_registry, new_tag, expected_error_message = expected_error_message)
+    print _docker_api.docker_image_push(new_harbor_registry, new_tag, expected_error_message = expected_error_message)
 
     return r'{}/{}'.format(project_name, image), new_tag
 

@@ -8,7 +8,7 @@ from library.system import System
 from library.project import Project
 from library.user import User
 from library.repository import Repository
-from library.repository import push_image_to_project
+from library.repository import push_image_to_project,push_special_image_to_project
 
 class TestProjects(unittest.TestCase):
     @classmethod
@@ -95,6 +95,9 @@ class TestProjects(unittest.TestCase):
         #5. Check if image in project_Alice and another image in project_Luca were both scanned.
         self.repo.check_image_scan_result(TestProjects.repo_Alice_name, tag_Alice, **USER_ALICE_CLIENT)
         self.repo.check_image_scan_result(TestProjects.repo_Luca_name, tag_Luca, **USER_LUCA_CLIENT)
+
+        print "****zzmtest****"
+        push_special_image_to_project(project_Luca_name, harbor_server, user_Luca_name, user_common_password, "zzmtest", size=1024)
 
 if __name__ == '__main__':
     unittest.main()
