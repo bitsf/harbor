@@ -126,7 +126,9 @@ func (suite *EnqueuerTestSuite) prepare() {
 	now := time.Now()
 	minute := now.Minute()
 
+	fmt.Println("zzmtest0", "0-59 %d * * * *")
 	coreSpec := fmt.Sprintf("0-59 %d * * * *", minute)
+	fmt.Println("zzmtest1", coreSpec)
 
 	// Prepare one
 	p := &Policy{
@@ -135,8 +137,10 @@ func (suite *EnqueuerTestSuite) prepare() {
 		CronSpec: coreSpec,
 	}
 	rawData, err := p.Serialize()
+	fmt.Println("zzmtest2", string(rawData))
 	assert.Nil(suite.T(), err, "prepare data: nil error expected but got %s", err)
 	key := rds.KeyPeriodicPolicy(suite.namespace)
+	fmt.Println("zzmtest3", key)
 
 	conn := suite.pool.Get()
 	defer func() {
@@ -145,4 +149,6 @@ func (suite *EnqueuerTestSuite) prepare() {
 
 	_, err = conn.Do("ZADD", key, time.Now().Unix(), rawData)
 	assert.Nil(suite.T(), err, "prepare policy: nil error expected but got %s", err)
+	bytes, err := redis.Values(conn.Do("ZRANGE", key, 0, -1))
+	fmt.Println("zzmtest4", string(bytes[0].([]byte)))
 }

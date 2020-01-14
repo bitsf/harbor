@@ -20,7 +20,7 @@ function listDeps(){
 	done
 }
 
-packages=$(go list ./... | grep -v -E 'vendor|tests|testing')
+packages=$(go list ./... | grep -v -E 'vendor|tests|testing' | grep jobservice|grep period)
 echo testing packages: $packages
 
 for package in $packages
