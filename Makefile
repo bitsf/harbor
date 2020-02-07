@@ -195,7 +195,7 @@ ifeq ($(CLAIRFLAG), true)
 endif
 # append chartmuseum parameters if set
 ifeq ($(CHARTFLAG), true)
-    PREPARECMD_PARA+= --with-chartmuseum
+	PREPARECMD_PARA+= --with-chartmuseum
 endif
 
 # makefile
@@ -346,6 +346,12 @@ build:
 	 -e CHARTMUSEUMVERSION=$(CHARTMUSEUMVERSION) -e DOCKERIMAGENAME_CHART_SERVER=$(DOCKERIMAGENAME_CHART_SERVER) \
 	 -e NPM_REGISTRY=$(NPM_REGISTRY) -e BASEIMAGETAG=$(BASEIMAGETAG)
 
+pull_base_docker:
+	@for name in chartserver clair clair-adapter core db jobservice log nginx notary-server notary-signer portal prepare redis registry registryctl; do \
+		echo pull goharbor/harbor-$$name-base:$(BASEIMAGETAG) ; \
+		$(DOCKERPULL) goharbor/harbor-$$name-base:$(BASEIMAGETAG) ;\
+	done
+
 build_base_docker:
 	@for name in chartserver clair clair-adapter core db jobservice log nginx notary-server notary-signer portal prepare redis registry registryctl; do \
 		echo $$name ; \
@@ -464,9 +470,9 @@ start:
 
 down:
 	@while [ -z "$$CONTINUE" ]; do \
-        read -r -p "Type anything but Y or y to exit. [Y/N]: " CONTINUE; \
-    done ; \
-    [ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (echo "Exiting."; exit 1;)
+		read -r -p "Type anything but Y or y to exit. [Y/N]: " CONTINUE; \
+	done ; \
+	[ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (echo "Exiting."; exit 1;)
 	@echo "stoping harbor instance..."
 	@$(DOCKERCOMPOSECMD) $(DOCKERCOMPOSE_FILE_OPT) down -v
 	@echo "Done."
