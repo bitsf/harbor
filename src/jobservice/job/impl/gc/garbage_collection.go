@@ -19,19 +19,18 @@ import (
 	"os"
 	"time"
 
+	"github.com/goharbor/harbor/src/common"
+	"github.com/goharbor/harbor/src/common/config"
 	"github.com/goharbor/harbor/src/common/models"
+	"github.com/goharbor/harbor/src/common/registryctl"
 	"github.com/goharbor/harbor/src/controller/artifact"
 	"github.com/goharbor/harbor/src/controller/project"
+	"github.com/goharbor/harbor/src/internal/cache"
+	"github.com/goharbor/harbor/src/jobservice/job"
+	"github.com/goharbor/harbor/src/jobservice/logger"
 	"github.com/goharbor/harbor/src/lib/q"
 	"github.com/goharbor/harbor/src/pkg/artifactrash"
 	"github.com/goharbor/harbor/src/pkg/blob"
-
-	"github.com/garyburd/redigo/redis"
-	"github.com/goharbor/harbor/src/common"
-	"github.com/goharbor/harbor/src/common/config"
-	"github.com/goharbor/harbor/src/common/registryctl"
-	"github.com/goharbor/harbor/src/jobservice/job"
-	"github.com/goharbor/harbor/src/jobservice/logger"
 	"github.com/goharbor/harbor/src/registryctl/client"
 )
 
@@ -192,17 +191,19 @@ func (gc *GarbageCollector) init(ctx job.Context, params job.Parameters) error {
 // cleanCache is to clean the registry cache for GC.
 // To do this is because the issue https://github.com/docker/distribution/issues/2094
 func (gc *GarbageCollector) cleanCache() error {
-	con, err := redis.DialURL(
-		gc.redisURL,
-		redis.DialConnectTimeout(dialConnectionTimeout),
-		redis.DialReadTimeout(dialReadTimeout),
-		redis.DialWriteTimeout(dialWriteTimeout),
-	)
-
+	pool, err := cache.GetRedisPool("GarbageCollector", gc.redisURL, &cache.RedisPoolParam{
+		PoolMaxIdle:           0,
+		PoolMaxActive:         1,
+		PoolIdleTimeout:       60 * time.Second,
+		DialConnectionTimeout: dialConnectionTimeout,
+		DialReadTimeout:       dialReadTimeout,
+		DialWriteTimeout:      dialWriteTimeout,
+	})
 	if err != nil {
 		gc.logger.Errorf("failed to connect to redis %v", err)
 		return err
 	}
+	con := pool.Get()
 	defer con.Close()
 
 	// clean all keys in registry redis DB.

@@ -22,6 +22,7 @@ on:
 
 jobs:
   UTTEST:
+    if: false
     env:
        UTTEST: true
     runs-on:
@@ -87,11 +88,12 @@ jobs:
           flags: unittests
 
   APITEST_DB:
+    if: true
     env:
       APITEST_DB: true
     runs-on:
-      #- self-hosted
-      - ubuntu-latest
+      - self-hosted
+      #- ubuntu-latest
     steps:
       - name: Set up Go 1.13
         uses: actions/setup-go@v1
@@ -141,8 +143,8 @@ jobs:
           helm2 plugin install https://github.com/chartmuseum/helm-push
           wget https://get.helm.sh/helm-v3.1.1-linux-386.tar.gz && tar zxvf helm-v3.1.1-linux-386.tar.gz
           sudo mv linux-386/helm /usr/local/bin/helm3
-          helm3 plugin install https://github.com/chartmuseum/helm-push
-          mkdir -p $CNAB_PATH && cd $CNAB_PATH && git clone https://github.com/cnabio/cnab-to-oci.git
+          helm3 plugin list | grep push || helm3 plugin install https://github.com/chartmuseum/helm-push
+          rm -rf $CNAB_PATH;mkdir -p $CNAB_PATH && cd $CNAB_PATH && git clone https://github.com/cnabio/cnab-to-oci.git
           cd cnab-to-oci && git checkout v0.3.0-beta4
           go list
           make build
@@ -182,6 +184,7 @@ jobs:
           df -h
 
   APITEST_LDAP:
+    if: false
     env:
       APITEST_LDAP: true
     runs-on:
@@ -243,6 +246,7 @@ jobs:
           df -h
 
   OFFLINE:
+    if: false
     env:
       OFFLINE: true
     runs-on:
@@ -299,6 +303,7 @@ jobs:
           df -h
 
   UI_UT:
+    if: false
     env:
       UI_UT: true
     runs-on:

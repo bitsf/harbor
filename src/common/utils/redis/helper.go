@@ -22,10 +22,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/goharbor/harbor/src/common/utils"
 	"github.com/goharbor/harbor/src/core/config"
+	"github.com/goharbor/harbor/src/internal/cache"
 	"github.com/goharbor/harbor/src/lib/log"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
@@ -148,9 +149,12 @@ var (
 	pool     *redis.Pool
 	poolOnce sync.Once
 
-	poolMaxIdle           = 200
-	poolMaxActive         = 1000
-	poolIdleTimeout int64 = 180
+	poolMaxIdle                 = 200
+	poolMaxActive               = 1000
+	poolIdleTimeout       int64 = 180
+	dialConnectionTimeout       = 30 * time.Second
+	dialReadTimeout             = time.Minute + 10*time.Second
+	dialWriteTimeout            = 10 * time.Second
 )
 
 // DefaultPool return default redis pool
@@ -171,24 +175,18 @@ func DefaultPool() *redis.Pool {
 			idleTimeout = poolIdleTimeout
 		}
 
-		pool = &redis.Pool{
-			Dial: func() (redis.Conn, error) {
-				url := config.GetRedisOfRegURL()
-				if url == "" {
-					url = "redis://localhost:6379/1"
-				}
-
-				return redis.DialURL(url)
-			},
-			TestOnBorrow: func(c redis.Conn, t time.Time) error {
-				_, err := c.Do("PING")
-				return err
-			},
-			MaxIdle:     maxIdle,
-			MaxActive:   maxActive,
-			IdleTimeout: time.Duration(idleTimeout) * time.Second,
-			Wait:        true,
+		url := config.GetRedisOfRegURL()
+		if url == "" {
+			url = "redis://localhost:6379/1"
 		}
+		pool, err = cache.GetRedisPool("CommonRedis", url, &cache.RedisPoolParam{
+			PoolMaxIdle:           maxIdle,
+			PoolMaxActive:         maxActive,
+			PoolIdleTimeout:       time.Duration(idleTimeout) * time.Second,
+			DialConnectionTimeout: dialConnectionTimeout,
+			DialReadTimeout:       dialReadTimeout,
+			DialWriteTimeout:      dialWriteTimeout,
+		})
 	})
 
 	return pool

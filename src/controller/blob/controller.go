@@ -19,13 +19,13 @@ import (
 	"fmt"
 
 	"github.com/docker/distribution"
-	"github.com/garyburd/redigo/redis"
 	"github.com/goharbor/harbor/src/common/models"
 	util "github.com/goharbor/harbor/src/common/utils/redis"
 	"github.com/goharbor/harbor/src/lib/errors"
 	"github.com/goharbor/harbor/src/lib/log"
 	"github.com/goharbor/harbor/src/lib/orm"
 	"github.com/goharbor/harbor/src/pkg/blob"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (

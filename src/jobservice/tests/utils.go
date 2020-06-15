@@ -21,6 +21,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/goharbor/harbor/src/internal/cache"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -36,22 +37,14 @@ const (
 // GiveMeRedisPool ...
 func GiveMeRedisPool() *redis.Pool {
 	redisHost := getRedisHost()
-	redisPool := &redis.Pool{
-		MaxActive: 6,
-		MaxIdle:   6,
-		Wait:      true,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial(
-				"tcp",
-				fmt.Sprintf("%s:%d", redisHost, 6379),
-				redis.DialConnectTimeout(dialConnectionTimeout),
-				redis.DialReadTimeout(dialReadTimeout),
-				redis.DialWriteTimeout(dialWriteTimeout),
-			)
-		},
-	}
-
-	return redisPool
+	pool, _ := cache.GetRedisPool("test", fmt.Sprintf("redis://%s:%d", redisHost, 6379), &cache.RedisPoolParam{
+		PoolMaxIdle:           6,
+		PoolMaxActive:         6,
+		DialConnectionTimeout: dialConnectionTimeout,
+		DialReadTimeout:       dialReadTimeout,
+		DialWriteTimeout:      dialWriteTimeout,
+	})
+	return pool
 }
 
 // GiveMeTestNamespace ...

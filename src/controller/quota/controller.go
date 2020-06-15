@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	util "github.com/goharbor/harbor/src/common/utils/redis"
 	"github.com/goharbor/harbor/src/lib/errors"
 	"github.com/goharbor/harbor/src/lib/log"
@@ -28,6 +27,7 @@ import (
 	"github.com/goharbor/harbor/src/pkg/quota"
 	"github.com/goharbor/harbor/src/pkg/quota/driver"
 	"github.com/goharbor/harbor/src/pkg/types"
+	"github.com/gomodule/redigo/redis"
 
 	// quota driver
 	_ "github.com/goharbor/harbor/src/controller/quota/driver"

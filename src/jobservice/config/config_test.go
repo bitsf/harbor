@@ -132,7 +132,7 @@ func setENV() error {
 	err = os.Setenv("JOB_SERVICE_HTTPS_KEY", "../server.key")
 	err = os.Setenv("JOB_SERVICE_POOL_BACKEND", "redis")
 	err = os.Setenv("JOB_SERVICE_POOL_WORKERS", "8")
-	err = os.Setenv("JOB_SERVICE_POOL_REDIS_URL", "8.8.8.8:6379,100,password,0")
+	err = os.Setenv("JOB_SERVICE_POOL_REDIS_URL", "8.8.8.8:6379|100|password|0")
 	err = os.Setenv("JOB_SERVICE_POOL_REDIS_NAMESPACE", "ut_namespace")
 	err = os.Setenv("JOBSERVICE_SECRET", "js_secret")
 	err = os.Setenv("CORE_SECRET", "core_secret")

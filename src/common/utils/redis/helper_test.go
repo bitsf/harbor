@@ -20,9 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/goharbor/harbor/src/common/utils"
+	"github.com/goharbor/harbor/src/internal/cache"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const testingRedisHost = "REDIS_HOST"
@@ -32,11 +33,12 @@ func init() {
 }
 
 func TestRedisLock(t *testing.T) {
-	con, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", getRedisHost(), 6379))
-	assert.Nil(t, err)
-	defer con.Close()
+	pool, err := cache.GetRedisPool("test", fmt.Sprintf("redis://%s:%d", getRedisHost(), 6379), nil)
+	require.Nil(t, err)
+	conn := pool.Get()
+	defer conn.Close()
 
-	rm := New(con, "test-redis-lock", "test-value")
+	rm := New(conn, "test-redis-lock", "test-value")
 
 	successLock, err := rm.Require()
 	assert.Nil(t, err)
@@ -55,8 +57,9 @@ func TestRedisLock(t *testing.T) {
 func TestRequireLock(t *testing.T) {
 	assert := assert.New(t)
 
-	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", getRedisHost(), 6379))
-	assert.Nil(err)
+	pool, err := cache.GetRedisPool("test", fmt.Sprintf("redis://%s:%d", getRedisHost(), 6379), nil)
+	require.Nil(t, err)
+	conn := pool.Get()
 	defer conn.Close()
 
 	if l, err := RequireLock(utils.GenerateRandomString(), conn); assert.Nil(err) {
@@ -83,8 +86,10 @@ func TestFreeLock(t *testing.T) {
 		assert.Nil(FreeLock(l))
 	}
 
-	conn, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", getRedisHost(), 6379))
-	assert.Nil(err)
+	pool, err := cache.GetRedisPool("test", fmt.Sprintf("redis://%s:%d", getRedisHost(), 6379), nil)
+	require.Nil(t, err)
+	conn := pool.Get()
+	defer conn.Close()
 
 	if l, err := RequireLock(utils.GenerateRandomString(), conn); assert.Nil(err) {
 		conn.Close()

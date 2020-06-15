@@ -112,7 +112,7 @@ func TranslateRedisAddress(commaFormat string) (string, bool) {
 		return "", false
 	}
 
-	sections := strings.Split(commaFormat, ",")
+	sections := strings.Split(commaFormat, "|")
 	totalSections := len(sections)
 	if totalSections == 0 {
 		return "", false
