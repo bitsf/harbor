@@ -30,7 +30,7 @@ if [ $GITHUB_TOKEN ];
 then
     sed "s/# github_token: xxx/github_token: $GITHUB_TOKEN/" -i make/harbor.yml
 fi
-sudo make install COMPILETAG=compile_golangimage GOBUILDTAGS="include_oss include_gcs" NOTARYFLAG=true CLAIRFLAG=true TRIVYFLAG=true CHARTFLAG=true GEN_TLS=true
+sudo make install COMPILETAG=compile_golangimage GOBUILDTAGS="include_oss include_gcs" NOTARYFLAG=true CLAIRFLAG=true TRIVYFLAG=true CHARTFLAG=true GEN_TLS=true NPM_REGISTRY=http://build-artifactory.eng.vmware.com/artifactory/api/npm/npm
 
 # waiting 5 minutes to start
 for((i=1;i<=30;i++)); do
